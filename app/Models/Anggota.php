@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Anggota extends Model
 {
+    // Mengamankan nama tabel
+    protected $table = 'anggotas';
+    
     protected $guarded = ['id'];
 
     public function pinjamans()

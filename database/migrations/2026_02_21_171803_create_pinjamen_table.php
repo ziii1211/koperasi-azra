@@ -10,21 +10,31 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('pinjamans', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('anggota_id')->constrained('anggotas')->cascadeOnDelete();
-        $table->string('mulai_bulan'); // Contoh: "FEB/JUNI"
-        $table->decimal('jumlah_pinjaman', 15, 2); 
-        $table->integer('lama_angsuran'); 
-        $table->decimal('angsuran_pokok', 15, 2);
-        $table->decimal('jasa', 15, 2);
-        $table->decimal('jumlah_angsuran', 15, 2); // Pokok + Jasa
-        $table->decimal('sisa_pokok', 15, 2);
-        $table->enum('status', ['Aktif', 'Lunas', 'Top Up'])->default('Aktif');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('pinjamans', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('anggota_id')->constrained('anggotas')->cascadeOnDelete();
+            
+            // TAMBAHAN BARU: Kolom Tanggal Pinjaman
+            $table->date('tanggal_pinjaman'); 
+            
+            $table->string('mulai_bulan');
+            $table->integer('angsuran_jumlah');
+            $table->integer('angsuran_ke');
+            $table->integer('angsuran_sisa');
+            
+            $table->decimal('jumlah_pinjaman', 15, 2);
+            $table->decimal('angsuran_pokok', 15, 2);
+            $table->decimal('jasa_pinjaman', 15, 2);
+            $table->decimal('jumlah_angsuran', 15, 2);
+            $table->decimal('sisa_pinjaman', 15, 2);
+            $table->decimal('sisa_pokok_pinjaman', 15, 2);
+            $table->decimal('keterangan_jumlah', 15, 2)->nullable();
+            
+            $table->string('status')->default('Aktif');
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.
