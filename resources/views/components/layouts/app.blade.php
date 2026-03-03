@@ -83,6 +83,12 @@
                     <svg class="w-5 h-5 ml-1 relative z-10 {{ request()->is('mutasi-rekening') ? '' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110 group-hover:text-blue-500 transition-all' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                     <span class="relative z-10">Mutasi Rekening</span>
                 </a>
+
+                <a href="/input-data-anggota" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all border group relative overflow-hidden {{ request()->is('input-data-anggota') ? 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-600 border-blue-100/50 shadow-sm' : 'text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-100' }}">
+                    @if(request()->is('input-data-anggota')) <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-blue-600 rounded-r-full"></div> @endif
+                    <svg class="w-5 h-5 ml-1 relative z-10 {{ request()->is('input-data-anggota') ? '' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110 group-hover:text-blue-500 transition-all' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    <span class="relative z-10">input-data-anggota</span>
+                </a>
             </nav>
         </div>
 

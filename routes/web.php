@@ -7,6 +7,7 @@ use App\Livewire\BukuKasModal;
 use App\Livewire\DataPeminjam;
 use App\Livewire\TagihanAngsuran;
 use App\Livewire\MutasiRekening;
+use App\Http\Controllers\LaporanController;
 
 
 // Jika user mengakses rute awal, otomatis arahkan ke login
@@ -31,5 +32,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/data-peminjam', DataPeminjam::class)->name('data-peminjam');
     Route::get('/tagihan-angsuran', TagihanAngsuran::class)->name('tagihan-angsuran');
     Route::get('/mutasi-rekening', MutasiRekening::class)->name('mutasi-rekening');
+    Route::get('/input-data-anggota', App\Livewire\InputDataAnggota::class)->name('input.data.anggota');
+
+// Route untuk Download Laporan
+Route::get('/export/tagihan/pdf', [LaporanController::class, 'tagihanPdf'])->name('export.tagihan.pdf');
+Route::get('/export/tagihan/excel', [LaporanController::class, 'tagihanExcel'])->name('export.tagihan.excel');
  
 });

@@ -187,26 +187,18 @@
                         <label class="block text-sm font-bold text-slate-700 mb-2">Kategori</label>
                         <select wire:model="kategori_kas" class="w-full border-2 border-slate-100 bg-slate-50 focus:bg-white rounded-xl px-4 py-3 font-semibold text-slate-700 focus:ring-0 focus:border-indigo-500 outline-none transition-all cursor-pointer">
                             <option value="Modal Kas">Modal Kas (Utama)</option>
-                            <option value="Mutasi Rekening">Mutasi Rekening</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Aliran Dana</label>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4">
                         <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all {{ $jenis_transaksi == 'Pemasukan' ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 bg-slate-50 hover:bg-slate-100' }}">
                             <input type="radio" wire:model.live="jenis_transaksi" value="Pemasukan" class="hidden">
                             <div class="flex items-center justify-center w-full gap-2">
                                 <svg class="w-5 h-5 {{ $jenis_transaksi == 'Pemasukan' ? 'text-emerald-600' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
                                 <span class="font-bold text-base {{ $jenis_transaksi == 'Pemasukan' ? 'text-emerald-700' : 'text-slate-600' }}">Dana Masuk</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all {{ $jenis_transaksi == 'Pengeluaran' ? 'border-orange-500 bg-orange-50/50' : 'border-slate-100 bg-slate-50 hover:bg-slate-100' }}">
-                            <input type="radio" wire:model.live="jenis_transaksi" value="Pengeluaran" class="hidden">
-                            <div class="flex items-center justify-center w-full gap-2">
-                                <svg class="w-5 h-5 {{ $jenis_transaksi == 'Pengeluaran' ? 'text-orange-600' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                                <span class="font-bold text-base {{ $jenis_transaksi == 'Pengeluaran' ? 'text-orange-700' : 'text-slate-600' }}">Dana Keluar</span>
                             </div>
                         </label>
                     </div>

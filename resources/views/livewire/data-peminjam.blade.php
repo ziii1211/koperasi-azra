@@ -63,7 +63,7 @@
                         <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-right w-40">JUMLAH ANGSURAN</th>
                         <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-right w-40">SISA PINJAMAN</th>
                         <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-right w-40">SISA POKOK</th>
-                        <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-right w-40">KETERANGAN JMLH</th>
+                        <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-center w-40">KETERANGAN</th>
                         <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-center w-32">STATUS</th>
                         <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase text-center sticky right-0 bg-slate-50/90 backdrop-blur-sm z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)]">AKSI</th>
                     </tr>
@@ -88,7 +88,12 @@
                             <td class="px-5 py-4"><div class="flex justify-between items-center w-full font-bold text-indigo-600"><span class="text-[10px] text-indigo-300 mr-2">Rp</span><span>{{ number_format($pinjaman->jumlah_angsuran, 0, ',', '.') }}</span></div></td>
                             <td class="px-5 py-4"><div class="flex justify-between items-center w-full font-bold text-orange-600"><span class="text-[10px] text-orange-300 mr-2">Rp</span><span>{{ number_format($pinjaman->sisa_pinjaman, 0, ',', '.') }}</span></div></td>
                             <td class="px-5 py-4"><div class="flex justify-between items-center w-full font-semibold text-slate-600"><span class="text-[10px] text-slate-400 mr-2">Rp</span><span>{{ number_format($pinjaman->sisa_pokok_pinjaman, 0, ',', '.') }}</span></div></td>
-                            <td class="px-5 py-4"><div class="flex justify-between items-center w-full font-bold text-emerald-600"><span class="text-[10px] text-emerald-300 mr-2">Rp</span><span>{{ number_format($pinjaman->keterangan_jumlah, 0, ',', '.') }}</span></div></td>
+                            
+                            <td class="px-5 py-4">
+                                <div class="flex justify-center items-center w-full font-bold text-slate-600 uppercase">
+                                    <span>{{ $pinjaman->keterangan_jumlah }}</span>
+                                </div>
+                            </td>
                             
                             <td class="px-5 py-4 text-center">
                                 @if($pinjaman->status == 'Aktif')
@@ -138,11 +143,46 @@
             
             <form wire:submit.prevent="simpanPeminjam" class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">N A M A</label>
-                        <input type="text" wire:model="nama" placeholder="Contoh: AAT SETIAWAN" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none uppercase">
-                        @error('nama') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
+                    
+                    <div class="relative">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">PILIH NAMA ANGGOTA</label>
+                        
+                        <div wire:click="toggleDropdown" class="w-full border-2 {{ $anggotaTerpilih ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-100 bg-slate-50' }} rounded-xl px-4 py-3 font-semibold cursor-pointer flex justify-between items-center hover:bg-white hover:border-indigo-300 transition-all select-none">
+                            <span class="{{ $anggotaTerpilih ? 'text-indigo-700 font-bold uppercase' : 'text-slate-400 font-medium' }} truncate pr-2">
+                                {{ $anggotaTerpilih ? $namaAnggotaTerpilih : 'Pilih Nama Anggota...' }}
+                            </span>
+                            <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 {{ $dropdownOpen ? 'rotate-180 text-indigo-500' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+
+                        @if($dropdownOpen)
+                        <div wire:click.away="closeDropdown" class="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] overflow-hidden">
+                            <div class="p-3 border-b border-slate-100 bg-slate-50/50 sticky top-0 z-10">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                    </div>
+                                    <input type="text" wire:model.live.debounce.300ms="searchAnggota" placeholder="Ketik pencarian..." class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none uppercase" autocomplete="off" autofocus>
+                                </div>
+                            </div>
+                            
+                            <ul class="max-h-56 overflow-y-auto divide-y divide-slate-50">
+                                @forelse($this->getDaftarAnggota() as $anggota)
+                                    <li wire:click="selectAnggota({{ $anggota->id }}, '{{ addslashes($anggota->nama) }}')" class="px-4 py-3 hover:bg-indigo-50 cursor-pointer transition-colors group flex flex-col">
+                                        <span class="font-bold text-slate-700 group-hover:text-indigo-700 text-sm uppercase">{{ $anggota->nama }}</span>
+                                        <span class="text-[10px] font-bold text-slate-400 mt-0.5">NRP: {{ $anggota->nrp ?? '-' }} <span class="mx-1">•</span> Bank: {{ $anggota->bank ?? '-' }}</span>
+                                    </li>
+                                @empty
+                                    <li class="px-4 py-6 flex flex-col items-center justify-center text-slate-400">
+                                        <svg class="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="text-sm font-bold">Data tidak ditemukan</span>
+                                    </li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        @endif
+                        @error('anggota_id') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">TGL PENCAIRAN (PINJAM)</label>
                         <input type="date" wire:model="tanggal_pinjaman" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
@@ -150,8 +190,24 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">MULAI BULAN</label>
-                        <input type="text" wire:model="mulai_bulan" placeholder="Contoh: JUNI/SELESAI" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none uppercase">
+                        <input type="text" wire:model="mulai_bulan" placeholder class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none uppercase">
                         @error('mulai_bulan') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 p-4 bg-indigo-50/40 border border-indigo-100/60 rounded-2xl">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Tunjangan Dibayarkan</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <span class="text-slate-400 font-bold">Rp</span>
+                            </div>
+                            <input type="text" wire:model="tunjangan_anggota" readonly class="w-full pl-11 pr-4 py-3 bg-slate-200/50 border-2 border-slate-100/50 text-emerald-600 font-bold rounded-xl outline-none cursor-not-allowed" placeholder="0">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Bank & Rekening</label>
+                        <input type="text" wire:model="rekening_anggota" readonly class="w-full px-4 py-3 bg-slate-200/50 border-2 border-slate-100/50 text-slate-600 font-bold rounded-xl outline-none cursor-not-allowed" placeholder="Pilih nama anggota dulu...">
                     </div>
                 </div>
 
@@ -174,38 +230,43 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">JUMLAH PINJAMAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="jumlah_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="text" inputmode="numeric" wire:model.live.debounce.500ms="jumlah_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-colors">
                         @error('jumlah_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
+                    
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">ANGSURAN POKOK (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="angsuran_pokok" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="text" wire:model="angsuran_pokok" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-500 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
                         @error('angsuran_pokok') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">JASA PINJAMAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="jasa_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="text" inputmode="numeric" wire:model.live.debounce.500ms="jasa_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none transition-colors">
                         @error('jasa_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">JUMLAH ANGSURAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="jumlah_angsuran" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-indigo-600 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="text" wire:model="jumlah_angsuran" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-indigo-500 rounded-xl px-4 py-3 font-extrabold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
                         @error('jumlah_angsuran') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">SISA PINJAMAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="sisa_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-orange-600 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="text" wire:model="sisa_pinjaman" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-orange-600 rounded-xl px-4 py-3 font-extrabold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
                         @error('sisa_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">SISA POKOK PINJAMAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="sisa_pokok_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="text" wire:model="sisa_pokok_pinjaman" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-600 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
                         @error('sisa_pokok_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">KETERANGAN JMLH (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model="keterangan_jumlah" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">KETERANGAN</label>
+                        <input type="text" wire:model="keterangan_jumlah" placeholder class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-colors uppercase">
                         @error('keterangan_jumlah') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
 

@@ -20,7 +20,16 @@ class DataPeminjam extends Component
     
     public $perPage = 10; 
 
-    public $nama, $tanggal_pinjaman, $mulai_bulan;
+    public $anggota_id;
+    public $searchAnggota = '';
+    public $namaAnggotaTerpilih = '';
+    public $anggotaTerpilih = false;
+    public $dropdownOpen = false; 
+
+    public $tunjangan_anggota;
+    public $rekening_anggota;
+
+    public $tanggal_pinjaman, $mulai_bulan;
     public $angsuran_jumlah, $angsuran_ke, $angsuran_sisa;
     public $jumlah_pinjaman, $angsuran_pokok, $jasa_pinjaman, $jumlah_angsuran;
     public $sisa_pinjaman, $sisa_pokok_pinjaman, $keterangan_jumlah;
@@ -30,21 +39,83 @@ class DataPeminjam extends Component
     public function updatingPerPage() { $this->resetPage(); }
     public function updatingSearch() { $this->resetPage(); }
 
-    // FUNGSI CCTV: Otomatis menghitung SISA ANGSURAN
+    public function toggleDropdown()
+    {
+        $this->dropdownOpen = !$this->dropdownOpen;
+        if ($this->dropdownOpen) {
+            $this->searchAnggota = ''; 
+        }
+    }
+
+    public function closeDropdown()
+    {
+        $this->dropdownOpen = false;
+    }
+
+    public function getDaftarAnggota()
+    {
+        if (strlen($this->searchAnggota) > 0) {
+            return Anggota::where('nama', 'like', '%' . $this->searchAnggota . '%')
+                ->orWhere('nrp', 'like', '%' . $this->searchAnggota . '%')
+                ->limit(50)->get();
+        }
+        return Anggota::limit(50)->get(); 
+    }
+
+    public function selectAnggota($id, $nama)
+    {
+        $this->anggota_id = $id;
+        $this->namaAnggotaTerpilih = $nama;
+        $this->anggotaTerpilih = true;
+        $this->dropdownOpen = false; 
+        $this->searchAnggota = ''; 
+
+        $anggota = Anggota::find($id);
+        if ($anggota) {
+            $this->tunjangan_anggota = number_format($anggota->tunjangan, 0, ',', '.');
+            $this->rekening_anggota = ($anggota->bank ?? 'Bank -') . ' / ' . ($anggota->rekening ?? '-');
+        }
+    }
+
     public function updated($propertyName)
     {
-        // Jika yang diketik adalah kolom JMLH atau KE
-        if ($propertyName === 'angsuran_jumlah' || $propertyName === 'angsuran_ke') {
-            $jmlh = (int) $this->angsuran_jumlah;
-            $ke = (int) $this->angsuran_ke;
-            
-            // Logika: SISA = JMLH - KE
-            if ($jmlh >= $ke) {
-                $this->angsuran_sisa = $jmlh - $ke;
-            } else {
-                $this->angsuran_sisa = 0; // Cegah hasil minus
-            }
+        if (in_array($propertyName, ['angsuran_jumlah', 'angsuran_ke', 'jumlah_pinjaman', 'jasa_pinjaman'])) {
+            $this->hitungOtomatis();
         }
+    }
+
+    public function hitungOtomatis()
+    {
+        $clean = function($val) {
+            if (empty($val)) return 0;
+            return (float) preg_replace('/[^0-9]/', '', (string)$val);
+        };
+
+        $jmlhPinjaman = $clean($this->jumlah_pinjaman);
+        $jasaPinjaman = $clean($this->jasa_pinjaman);
+        $tenor = (int) $this->angsuran_jumlah;
+        $ke = (int) $this->angsuran_ke;
+
+        $sisaAngsuran = 0;
+        if ($tenor >= $ke && $tenor > 0) {
+            $sisaAngsuran = $tenor - $ke;
+        }
+        $this->angsuran_sisa = $sisaAngsuran;
+
+        $angsuranPokok = 0;
+        if ($tenor > 0) {
+            $angsuranPokok = $jmlhPinjaman / $tenor;
+        }
+        $this->angsuran_pokok = number_format($angsuranPokok, 0, '', '.');
+
+        $jumlahAngsuran = $angsuranPokok + $jasaPinjaman;
+        $this->jumlah_angsuran = number_format($jumlahAngsuran, 0, '', '.');
+
+        $sisaPokokPinjaman = $angsuranPokok * $sisaAngsuran;
+        $this->sisa_pokok_pinjaman = number_format($sisaPokokPinjaman, 0, '', '.');
+
+        $sisaPinjaman = $sisaPokokPinjaman + ($jasaPinjaman * $sisaAngsuran);
+        $this->sisa_pinjaman = number_format($sisaPinjaman, 0, '', '.');
     }
 
     public function openModal() { 
@@ -58,7 +129,9 @@ class DataPeminjam extends Component
 
     public function resetInput() {
         $this->reset([
-            'nama', 'tanggal_pinjaman', 'mulai_bulan', 'angsuran_jumlah', 'angsuran_ke', 'angsuran_sisa',
+            'searchAnggota', 'anggota_id', 'namaAnggotaTerpilih', 'anggotaTerpilih', 'dropdownOpen',
+            'tunjangan_anggota', 'rekening_anggota', 
+            'tanggal_pinjaman', 'mulai_bulan', 'angsuran_jumlah', 'angsuran_ke', 'angsuran_sisa',
             'jumlah_pinjaman', 'angsuran_pokok', 'jasa_pinjaman', 'jumlah_angsuran',
             'sisa_pinjaman', 'sisa_pokok_pinjaman', 'keterangan_jumlah', 'peminjam_id'
         ]);
@@ -70,7 +143,14 @@ class DataPeminjam extends Component
         $pinjaman = Pinjaman::with('anggota')->findOrFail($id);
         
         $this->peminjam_id = $pinjaman->id;
-        $this->nama = $pinjaman->anggota->nama;
+        
+        $this->anggota_id = $pinjaman->anggota_id;
+        $this->namaAnggotaTerpilih = $pinjaman->anggota->nama;
+        $this->anggotaTerpilih = true;
+        
+        $this->tunjangan_anggota = number_format($pinjaman->anggota->tunjangan, 0, ',', '.');
+        $this->rekening_anggota = ($pinjaman->anggota->bank ?? 'Bank -') . ' / ' . ($pinjaman->anggota->rekening ?? '-');
+
         $this->tanggal_pinjaman = $pinjaman->tanggal_pinjaman; 
         $this->mulai_bulan = $pinjaman->mulai_bulan;
         $this->angsuran_jumlah = $pinjaman->angsuran_jumlah;
@@ -84,16 +164,15 @@ class DataPeminjam extends Component
         $this->jumlah_angsuran = number_format($pinjaman->jumlah_angsuran, 0, '', '.');
         $this->sisa_pinjaman = number_format($pinjaman->sisa_pinjaman, 0, '', '.');
         $this->sisa_pokok_pinjaman = number_format($pinjaman->sisa_pokok_pinjaman, 0, '', '.');
-        $this->keterangan_jumlah = number_format($pinjaman->keterangan_jumlah, 0, '', '.');
+        $this->keterangan_jumlah = $pinjaman->keterangan_jumlah;
 
         $this->isModalOpen = true;
     }
 
     public function hapusPeminjam($id)
     {
-        $pinjaman = Pinjaman::findOrFail($id);
-        Anggota::where('id', $pinjaman->anggota_id)->delete();
-        session()->flash('message', 'Data peminjam berhasil dihapus.');
+        Pinjaman::findOrFail($id)->delete();
+        session()->flash('message', 'Data kontrak pinjaman berhasil dihapus.');
     }
 
     public function simpanPeminjam()
@@ -104,7 +183,7 @@ class DataPeminjam extends Component
         };
 
         $this->validate([
-            'nama' => 'required|string|max:255',
+            'anggota_id' => 'required|exists:anggotas,id',
             'tanggal_pinjaman' => 'required|date',
             'mulai_bulan' => 'required|string|max:50',
             'angsuran_jumlah' => 'required|numeric',
@@ -116,11 +195,12 @@ class DataPeminjam extends Component
             'jumlah_angsuran' => 'required',
             'sisa_pinjaman' => 'required',
             'sisa_pokok_pinjaman' => 'required',
-            'keterangan_jumlah' => 'required',
+            'keterangan_jumlah' => 'required|string',
             'status' => 'required|in:Aktif,Lunas,Jatuh Tempo', 
         ]);
 
         $dataPinjaman = [
+            'anggota_id' => $this->anggota_id,
             'tanggal_pinjaman' => $this->tanggal_pinjaman,
             'mulai_bulan' => strtoupper($this->mulai_bulan),
             'angsuran_jumlah' => $this->angsuran_jumlah,
@@ -132,29 +212,71 @@ class DataPeminjam extends Component
             'jumlah_angsuran' => $clean($this->jumlah_angsuran),
             'sisa_pinjaman' => $clean($this->sisa_pinjaman),
             'sisa_pokok_pinjaman' => $clean($this->sisa_pokok_pinjaman),
-            'keterangan_jumlah' => $clean($this->keterangan_jumlah),
+            'keterangan_jumlah' => strtoupper($this->keterangan_jumlah), 
             'status' => $this->status, 
         ];
 
         if ($this->peminjam_id) {
             $pinjaman = Pinjaman::findOrFail($this->peminjam_id);
-            $pinjaman->anggota->update(['nama' => strtoupper($this->nama)]);
             $pinjaman->update($dataPinjaman);
-            session()->flash('message', 'Data peminjam berhasil diperbarui.');
+            session()->flash('message', 'Data kontrak peminjam berhasil diperbarui.');
         } else {
-            $anggota = Anggota::create(['nama' => strtoupper($this->nama)]);
-            $dataPinjaman['anggota_id'] = $anggota->id;
-            
             $pinjamanBaru = Pinjaman::create($dataPinjaman);
             
             $jumlahTenor = (int) $this->angsuran_jumlah;
             $tglPinjam = Carbon::parse($this->tanggal_pinjaman);
             
-            for ($i = 1; $i <= $jumlahTenor; $i++) {
+            // --- LOGIKA PINTAR BACA TEKS BULAN MULAI ---
+            $bulanIndo = [
+                'JANUARI' => 1, 'FEBRUARI' => 2, 'MARET' => 3, 'APRIL' => 4,
+                'MEI' => 5, 'JUNI' => 6, 'JULI' => 7, 'AGUSTUS' => 8,
+                'SEPTEMBER' => 9, 'OKTOBER' => 10, 'NOVEMBER' => 11, 'DESEMBER' => 12
+            ];
+            
+            $mulaiBulanUpper = strtoupper($this->mulai_bulan);
+            $startMonth = $tglPinjam->month; 
+            $startYear = $tglPinjam->year;
+            
+            // 1. Coba deteksi tahun dari teks (misal admin ngetik "MARET 2026")
+            if (preg_match('/\b(20\d{2})\b/', $mulaiBulanUpper, $matches)) {
+                $startYear = (int) $matches[1];
+            }
+
+            // 2. Coba deteksi nama bulan dari teks (misal "MARET/SELESAI")
+            $bulanDitemukan = false;
+            foreach ($bulanIndo as $namaBulan => $angkaBulan) {
+                if (strpos($mulaiBulanUpper, $namaBulan) !== false) {
+                    $startMonth = $angkaBulan;
+                    $bulanDitemukan = true;
+                    
+                    // Kalau admin nggak nulis tahun, kita pakai logika:
+                    // Jika bulan mulai lebih KECIL dari bulan cair, otomatis berarti masuk tahun depan
+                    if (!isset($matches[1]) && $startMonth < $tglPinjam->month) {
+                        $startYear += 1;
+                    }
+                    break;
+                }
+            }
+
+            // 3. Fallback jika admin salah ketik parah (misal ngetik: "ASDFG")
+            if (!$bulanDitemukan) {
+                $startMonth = $tglPinjam->copy()->addMonth()->month;
+                $startYear = $tglPinjam->copy()->addMonth()->year;
+            }
+
+            // Menentukan tanggal jatuh tempo berdasarkan tanggal cair
+            $tglJatuhTempo = $tglPinjam->day;
+            if ($tglJatuhTempo > 28) $tglJatuhTempo = 28; // Mencegah eror di bulan Februari
+
+            $startDate = Carbon::createFromDate($startYear, $startMonth, $tglJatuhTempo);
+            
+            // 4. Looping pembuatan jadwal angsuran
+            for ($i = 0; $i < $jumlahTenor; $i++) {
                 JadwalAngsuran::create([
                     'pinjaman_id' => $pinjamanBaru->id,
-                    'angsuran_ke' => $i,
-                    'tanggal_jatuh_tempo' => $tglPinjam->copy()->addMonths($i)->format('Y-m-d'),
+                    'angsuran_ke' => $i + 1,
+                    // Tambah bulan dari start date yang sudah pintar di atas
+                    'tanggal_jatuh_tempo' => $startDate->copy()->addMonths($i)->format('Y-m-d'),
                     'nominal_tagihan' => $clean($this->jumlah_angsuran),
                     'status' => 'Belum Bayar'
                 ]);
@@ -170,12 +292,12 @@ class DataPeminjam extends Component
                 'tanggal' => $this->tanggal_pinjaman,
                 'kategori_kas' => 'Mutasi Rekening', 
                 'jenis_transaksi' => 'Pengeluaran',
-                'keterangan' => 'Pencairan Pinjaman A.n ' . strtoupper($this->nama),
+                'keterangan' => 'Pencairan Pinjaman A.n ' . strtoupper($this->namaAnggotaTerpilih),
                 'nominal' => $nominalCair,
                 'saldo_berjalan' => $newSaldo,
             ]);
 
-            session()->flash('message', 'Sukses! Pinjaman berhasil dicatat, jadwal dibuat, dan Dana Kas otomatis dipotong.');
+            session()->flash('message', 'Sukses! Pinjaman dicatat dan Jadwal Tagihan sukses masuk ke bulan yang ditentukan.');
         }
         $this->closeModal();
     }

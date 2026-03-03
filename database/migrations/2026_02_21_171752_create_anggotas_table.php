@@ -10,15 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('anggotas', function (Blueprint $table) {
-        $table->id();
-        $table->string('nama');
-        $table->string('nomor_hp')->nullable();
-        $table->text('alamat')->nullable();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('anggotas', function (Blueprint $table) {
+            $table->id(); // Ini otomatis jadi NO
+            $table->string('nama');
+            $table->string('pangkat')->nullable();
+            $table->string('nrp')->unique()->nullable(); // NRP biasanya unik
+            $table->decimal('tunjangan', 15, 2)->nullable(); // Tunjangan pakai decimal karena nominal uang
+            $table->string('bank')->nullable();
+            $table->string('rekening')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

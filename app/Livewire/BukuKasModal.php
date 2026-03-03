@@ -42,10 +42,11 @@ class BukuKasModal extends Component
     {
         $this->nominal = preg_replace('/[^0-9]/', '', $this->nominal);
 
+        // VALIDASI DIPERBARUI: Dihapus Mutasi Rekening & Pengeluaran
         $this->validate([
             'tanggal' => 'required|date',
-            'kategori_kas' => 'required|in:Mutasi Rekening,Modal Kas',
-            'jenis_transaksi' => 'required|in:Pemasukan,Pengeluaran',
+            'kategori_kas' => 'required|in:Modal Kas',
+            'jenis_transaksi' => 'required|in:Pemasukan',
             'keterangan' => 'required|string|max:255',
             'nominal' => 'required|numeric|min:1',
         ]);

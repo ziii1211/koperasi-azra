@@ -38,38 +38,38 @@ class TagihanAngsuran extends Component
             return;
         }
 
-        // 1. UPDATE STATUS BULAN INI
         $jadwal->update([
             'status' => 'Sudah Bayar',
             'tanggal_bayar' => Carbon::now()->format('Y-m-d')
         ]);
 
-        // 2. UPDATE KONTRAK INDUK (MENGURANGI SISA SECARA TEPAT)
         $pinjaman = $jadwal->pinjaman;
-        $pinjaman->angsuran_ke += 1;
-        $pinjaman->angsuran_sisa -= 1;
         
-        // Perbaikan: Hanya potong nominal 1 bulan, jadi datanya tidak tiba-tiba habis!
+        if ($pinjaman->angsuran_ke < $pinjaman->angsuran_jumlah) {
+            $pinjaman->angsuran_ke += 1;
+        }
+        
+        $pinjaman->angsuran_sisa = max(0, $pinjaman->angsuran_sisa - 1);
+        
         $pinjaman->sisa_pinjaman = max(0, $pinjaman->sisa_pinjaman - $jadwal->nominal_tagihan);
         $pinjaman->sisa_pokok_pinjaman = max(0, $pinjaman->sisa_pokok_pinjaman - $pinjaman->angsuran_pokok);
         
-        // 3. SET STATUS KONTRAK (LUNAS / AKTIF KEMBALI)
-        if ($pinjaman->angsuran_sisa <= 0) {
+        if ($pinjaman->angsuran_sisa <= 0 || $pinjaman->angsuran_ke >= $pinjaman->angsuran_jumlah) {
             $pinjaman->status = 'Lunas';
+            $pinjaman->angsuran_sisa = 0;
+            $pinjaman->sisa_pinjaman = 0;
+            $pinjaman->sisa_pokok_pinjaman = 0;
         } else {
-            // Cek apakah masih ada tunggakan lain di bulan sebelumnya?
             $masihNunggak = JadwalAngsuran::where('pinjaman_id', $pinjaman->id)
                 ->where('status', 'Belum Bayar')
                 ->where('tanggal_jatuh_tempo', '<', Carbon::now()->format('Y-m-d'))
                 ->exists();
                 
-            // Jika sudah bayar bulan ini dan tidak ada tunggakan masa lalu, kembali "Aktif"
             $pinjaman->status = $masihNunggak ? 'Jatuh Tempo' : 'Aktif';
         }
         
         $pinjaman->save();
 
-        // 4. MASUKKAN KE BUKU KAS
         $lastTransaksi = TransaksiKas::orderBy('tanggal', 'desc')->orderBy('id', 'desc')->first();
         $currentSaldo = $lastTransaksi ? $lastTransaksi->saldo_berjalan : 0;
         
@@ -80,27 +80,53 @@ class TagihanAngsuran extends Component
             'tanggal' => Carbon::now()->format('Y-m-d'),
             'kategori_kas' => 'Mutasi Rekening', 
             'jenis_transaksi' => 'Pemasukan',
-            'keterangan' => 'Angsuran Ke-' . $jadwal->angsuran_ke . ' A.n ' . $pinjaman->anggota->nama,
+            'keterangan' => 'Angsuran Ke-' . $jadwal->angsuran_ke . ' A.n ' . strtoupper($pinjaman->anggota->nama),
             'nominal' => $nominalUangMasuk,
             'saldo_berjalan' => $newSaldo,
         ]);
 
-        session()->flash('message', 'Sukses! Sisa hutang berkurang dan Status otomatis diperbarui.');
+        session()->flash('message', 'Sukses! Sisa hutang berkurang, Angsuran KE naik, dan Buku Kas bertambah.');
     }
 
     public function render()
     {
+        // 1. QUERY UNTUK TABEL DATA BAWAH
         $tagihans = JadwalAngsuran::with(['pinjaman.anggota'])
             ->whereMonth('tanggal_jatuh_tempo', $this->bulanFilter)
             ->whereYear('tanggal_jatuh_tempo', $this->tahunFilter)
             ->whereHas('pinjaman.anggota', function($query) {
                 $query->where('nama', 'like', '%' . $this->search . '%');
             })
-            ->orderBy('tanggal_jatuh_tempo', 'asc') // Urutan jatuh tempo
+            ->orderBy('tanggal_jatuh_tempo', 'asc') 
+            ->orderBy('id', 'asc') 
             ->paginate($this->perPage);
 
+        // 2. QUERY UNTUK 3 KOTAK STATISTIK ATAS (Hanya menghitung yang SUDAH BAYAR)
+        $jadwalTerbayar = JadwalAngsuran::with('pinjaman')
+            ->whereMonth('tanggal_jatuh_tempo', $this->bulanFilter)
+            ->whereYear('tanggal_jatuh_tempo', $this->tahunFilter)
+            ->where('status', 'Sudah Bayar')
+            ->get();
+
+        // LOGIKA PERHITUNGAN:
+        // Pembayaran = Total Angsuran Pokok yang lunas bulan ini
+        $totalPembayaran = $jadwalTerbayar->sum(function($jadwal) {
+            return $jadwal->pinjaman->angsuran_pokok;
+        });
+
+        // Profit = Total Jasa Pinjaman yang lunas bulan ini
+        $totalProfit = $jadwalTerbayar->sum(function($jadwal) {
+            return $jadwal->pinjaman->jasa_pinjaman;
+        });
+
+        // Laba Bersih = Hasil penjumlahan Pembayaran + Profit
+        $labaBersih = $totalPembayaran + $totalProfit;
+
         return view('livewire.tagihan-angsuran', [
-            'tagihans' => $tagihans
+            'tagihans' => $tagihans,
+            'totalPembayaran' => $totalPembayaran,
+            'totalProfit' => $totalProfit,
+            'labaBersih' => $labaBersih, // Kirim 3 variabel ini ke desain tampilan
         ])
         ->title('Tagihan Angsuran Bulanan')
         ->layout('components.layouts.app');
