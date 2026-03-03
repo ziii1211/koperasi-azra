@@ -11,6 +11,15 @@ class Login extends Component
     public $name = '';
     public $password = '';
     public $remember = false;
+    
+    // Properti untuk mengontrol visibilitas password
+    public $showPassword = false;
+
+    // Fungsi untuk mengubah status show/hide password
+    public function togglePassword()
+    {
+        $this->showPassword = !$this->showPassword;
+    }
 
     public function prosesLogin()
     {

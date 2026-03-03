@@ -6,7 +6,6 @@
         <div class="absolute -bottom-[20%] left-[20%] w-[600px] h-[600px] bg-purple-400/50 rounded-full mix-blend-multiply filter blur-[120px] animate-blob animation-delay-4000"></div>
         
         <div class="absolute inset-0 bg-white/30 backdrop-blur-[60px]"></div>
-        
         <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
     </div>
 
@@ -15,7 +14,6 @@
         <div class="text-center mb-10 relative">
             <div class="w-20 h-20 bg-gradient-to-tr from-slate-900 via-indigo-900 to-slate-800 rounded-[1.5rem] mx-auto flex items-center justify-center shadow-xl shadow-indigo-900/30 mb-6 relative group overflow-hidden border-2 border-white/50 ring-4 ring-indigo-50/50">
                  <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-                
                 <svg class="w-10 h-10 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -56,7 +54,21 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                     </div>
-                    <input type="password" wire:model="password" class="w-full pl-11 pr-4 py-3.5 bg-white/50 border-2 border-slate-100/80 rounded-2xl text-slate-800 font-bold placeholder:text-slate-400 placeholder:font-medium focus:ring-0 focus:border-indigo-500 focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm" placeholder="••••••••" required>
+                    
+                    <input type="{{ $showPassword ? 'text' : 'password' }}" wire:model="password" class="w-full pl-11 pr-12 py-3.5 bg-white/50 border-2 border-slate-100/80 rounded-2xl text-slate-800 font-bold placeholder:text-slate-400 placeholder:font-medium focus:ring-0 focus:border-indigo-500 focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm" placeholder="••••••••" required>
+                    
+                    <button type="button" wire:click="togglePassword" tabindex="-1" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 focus:outline-none transition-colors">
+                        @if($showPassword)
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        @else
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                        @endif
+                    </button>
                 </div>
             </div>
 
@@ -72,7 +84,6 @@
                 <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-gradient-xy"></div>
                 
                 <button type="submit" class="relative w-full flex items-center justify-center gap-3 bg-slate-900 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:bg-slate-800 overflow-hidden">
-                    
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-700 ease-in-out"></div>
                     
                     <span wire:loading.remove wire:target="prosesLogin" class="tracking-wide text-[1.05rem] relative z-10">Akses Dasbor</span>
