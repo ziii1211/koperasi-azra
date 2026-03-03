@@ -6,13 +6,12 @@
     <style>
         body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px; color: #000; }
         
-        .kop-surat { width: 100%; margin-bottom: 25px; border-collapse: collapse; }
-        .kop-surat td { border: none; padding: 0; }
-        
-        .judul-kop { text-align: center; }
+        /* Desain Judul (Rata Tengah Tanpa Logo) */
+        .judul-kop { text-align: center; margin-bottom: 25px; }
         .judul-kop h2 { margin: 0; padding: 0; font-size: 24px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
         .judul-kop p { margin: 5px 0 0 0; font-size: 13px; }
         
+        /* Desain Tabel Polos */
         .tabel-data { border-collapse: collapse; width: 100%; }
         .tabel-data th, .tabel-data td { 
             border: 1px solid #000; 
@@ -31,18 +30,11 @@
 </head>
 <body>
 
-    <table class="kop-surat">
-        <tr>
-
-            <td width="70%" class="judul-kop" style="vertical-align: top; padding-top: 20px;">
-                <h2>KOPERASI AZRA</h2>
-                <p>LAPORAN KEUANGAN ANGSURAN ANGGOTA</p>
-                <p><strong>PERIODE: BULAN {{ strtoupper($namaBulan) }} TAHUN {{ $tahun }}</strong></p>
-            </td>
-            
-            <td width="20%"></td>
-        </tr>
-    </table>
+    <div class="judul-kop">
+        <h2>KOPERASI AZRA</h2>
+        <p>LAPORAN KEUANGAN ANGSURAN ANGGOTA</p>
+        <p><strong>PERIODE: BULAN {{ strtoupper($namaBulan) }} TAHUN {{ $tahun }}</strong></p>
+    </div>
 
     <table class="tabel-data">
         <thead>

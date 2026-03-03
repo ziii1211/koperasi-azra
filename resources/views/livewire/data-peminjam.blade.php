@@ -130,10 +130,12 @@
     </div>
 
     @if($isModalOpen)
-    <div class="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
-        <div class="bg-white rounded-[2rem] w-full max-w-4xl shadow-2xl overflow-hidden animate-fade-up my-8">
-            <div class="px-8 py-5 flex justify-between items-center bg-slate-50/50 border-b border-slate-100">
-                <h3 class="text-xl font-bold text-slate-700">
+    <div class="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-sm">
+        
+        <div class="bg-white rounded-[2rem] w-full max-w-4xl shadow-2xl animate-fade-up flex flex-col max-h-[95vh]">
+            
+            <div class="px-6 py-4 sm:px-8 sm:py-5 flex justify-between items-center bg-slate-50/50 border-b border-slate-100 shrink-0 rounded-t-[2rem]">
+                <h3 class="text-lg sm:text-xl font-bold text-slate-700">
                     {{ $peminjam_id ? 'Update Data Peminjam' : 'Tambah Kontrak Peminjam Baru' }}
                 </h3>
                 <button wire:click="closeModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors">
@@ -141,14 +143,15 @@
                 </button>
             </div>
             
-            <form wire:submit.prevent="simpanPeminjam" class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+            <form wire:submit.prevent="simpanPeminjam" class="p-5 sm:p-8 overflow-y-auto">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-5">
                     
                     <div class="relative">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">PILIH NAMA ANGGOTA</label>
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">PILIH NAMA ANGGOTA</label>
                         
                         <div wire:click="toggleDropdown" class="w-full border-2 {{ $anggotaTerpilih ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-100 bg-slate-50' }} rounded-xl px-4 py-3 font-semibold cursor-pointer flex justify-between items-center hover:bg-white hover:border-indigo-300 transition-all select-none">
-                            <span class="{{ $anggotaTerpilih ? 'text-indigo-700 font-bold uppercase' : 'text-slate-400 font-medium' }} truncate pr-2">
+                            <span class="{{ $anggotaTerpilih ? 'text-indigo-700 font-bold uppercase' : 'text-slate-400 font-medium' }} truncate pr-2 text-sm sm:text-base">
                                 {{ $anggotaTerpilih ? $namaAnggotaTerpilih : 'Pilih Nama Anggota...' }}
                             </span>
                             <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 {{ $dropdownOpen ? 'rotate-180 text-indigo-500' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
@@ -184,96 +187,96 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">TGL PENCAIRAN (PINJAM)</label>
-                        <input type="date" wire:model="tanggal_pinjaman" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">TGL PENCAIRAN (PINJAM)</label>
+                        <input type="date" wire:model="tanggal_pinjaman" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none text-sm sm:text-base">
                         @error('tanggal_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">MULAI BULAN</label>
-                        <input type="text" wire:model="mulai_bulan" placeholder class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none uppercase">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">MULAI BULAN</label>
+                        <input type="text" wire:model="mulai_bulan" placeholder="Contoh: Maret" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none uppercase text-sm sm:text-base">
                         @error('mulai_bulan') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 p-4 bg-indigo-50/40 border border-indigo-100/60 rounded-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 mb-5 p-4 bg-indigo-50/40 border border-indigo-100/60 rounded-2xl">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Tunjangan Dibayarkan</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <span class="text-slate-400 font-bold">Rp</span>
+                                <span class="text-slate-400 font-bold text-sm sm:text-base">Rp</span>
                             </div>
-                            <input type="text" wire:model="tunjangan_anggota" readonly class="w-full pl-11 pr-4 py-3 bg-slate-200/50 border-2 border-slate-100/50 text-emerald-600 font-bold rounded-xl outline-none cursor-not-allowed" placeholder="0">
+                            <input type="text" wire:model="tunjangan_anggota" readonly class="w-full pl-11 pr-4 py-3 bg-slate-200/50 border-2 border-slate-100/50 text-emerald-600 font-bold rounded-xl outline-none cursor-not-allowed text-sm sm:text-base" placeholder="0">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Bank & Rekening</label>
-                        <input type="text" wire:model="rekening_anggota" readonly class="w-full px-4 py-3 bg-slate-200/50 border-2 border-slate-100/50 text-slate-600 font-bold rounded-xl outline-none cursor-not-allowed" placeholder="Pilih nama anggota dulu...">
+                        <input type="text" wire:model="rekening_anggota" readonly class="w-full px-4 py-3 bg-slate-200/50 border-2 border-slate-100/50 text-slate-600 font-bold rounded-xl outline-none cursor-not-allowed text-sm sm:text-base" placeholder="Pilih nama anggota dulu...">
                     </div>
                 </div>
 
-                <label class="block text-sm font-bold text-slate-700 mb-2">ANGSURAN (JMLH, KE, SISA)</label>
-                <div class="grid grid-cols-3 gap-3 mb-5">
+                <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">ANGSURAN (JMLH, KE, SISA)</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-5">
                     <div>
-                        <input type="number" wire:model.live.debounce.300ms="angsuran_jumlah" placeholder="JMLH (Total)" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="number" wire:model.live.debounce.300ms="angsuran_jumlah" placeholder="JMLH (Total)" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none text-sm sm:text-base">
                         @error('angsuran_jumlah') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <input type="number" wire:model.live.debounce.300ms="angsuran_ke" placeholder="KE Berapa" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none">
+                        <input type="number" wire:model.live.debounce.300ms="angsuran_ke" placeholder="KE Berapa" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none text-sm sm:text-base">
                         @error('angsuran_ke') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <input type="number" wire:model="angsuran_sisa" placeholder="SISA (Otomatis)" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-500 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0">
+                        <input type="number" wire:model="angsuran_sisa" placeholder="SISA (Otomatis)" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-500 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0 text-sm sm:text-base">
                         @error('angsuran_sisa') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 mb-5">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">JUMLAH PINJAMAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model.live.debounce.500ms="jumlah_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-colors">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">JUMLAH PINJAMAN (Rp)</label>
+                        <input type="text" inputmode="numeric" wire:model.live.debounce.500ms="jumlah_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-colors text-sm sm:text-base">
                         @error('jumlah_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">ANGSURAN POKOK (Rp)</label>
-                        <input type="text" wire:model="angsuran_pokok" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-500 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">ANGSURAN POKOK (Rp)</label>
+                        <input type="text" wire:model="angsuran_pokok" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-500 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0 text-sm sm:text-base" placeholder="0 (Otomatis)">
                         @error('angsuran_pokok') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">JASA PINJAMAN (Rp)</label>
-                        <input type="text" inputmode="numeric" wire:model.live.debounce.500ms="jasa_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none transition-colors">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">JASA PINJAMAN (Rp)</label>
+                        <input type="text" inputmode="numeric" wire:model.live.debounce.500ms="jasa_pinjaman" x-data x-on:input="$el.value = $el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')" placeholder="0" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none transition-colors text-sm sm:text-base">
                         @error('jasa_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">JUMLAH ANGSURAN (Rp)</label>
-                        <input type="text" wire:model="jumlah_angsuran" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-indigo-500 rounded-xl px-4 py-3 font-extrabold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">JUMLAH ANGSURAN (Rp)</label>
+                        <input type="text" wire:model="jumlah_angsuran" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-indigo-500 rounded-xl px-4 py-3 font-extrabold cursor-not-allowed outline-none focus:ring-0 text-sm sm:text-base" placeholder="0 (Otomatis)">
                         @error('jumlah_angsuran') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">SISA PINJAMAN (Rp)</label>
-                        <input type="text" wire:model="sisa_pinjaman" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-orange-600 rounded-xl px-4 py-3 font-extrabold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">SISA PINJAMAN (Rp)</label>
+                        <input type="text" wire:model="sisa_pinjaman" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-orange-600 rounded-xl px-4 py-3 font-extrabold cursor-not-allowed outline-none focus:ring-0 text-sm sm:text-base" placeholder="0 (Otomatis)">
                         @error('sisa_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">SISA POKOK PINJAMAN (Rp)</label>
-                        <input type="text" wire:model="sisa_pokok_pinjaman" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-600 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0" placeholder="0 (Otomatis)">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">SISA POKOK PINJAMAN (Rp)</label>
+                        <input type="text" wire:model="sisa_pokok_pinjaman" readonly class="w-full border-2 border-slate-200 bg-slate-200/50 text-slate-600 rounded-xl px-4 py-3 font-bold cursor-not-allowed outline-none focus:ring-0 text-sm sm:text-base" placeholder="0 (Otomatis)">
                         @error('sisa_pokok_pinjaman') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">KETERANGAN</label>
-                        <input type="text" wire:model="keterangan_jumlah" placeholder class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-colors uppercase">
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">KETERANGAN</label>
+                        <input type="text" wire:model="keterangan_jumlah" placeholder class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-extrabold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-colors uppercase text-sm sm:text-base">
                         @error('keterangan_jumlah') <span class="text-[11px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">STATUS PINJAMAN</label>
+                        <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">STATUS PINJAMAN</label>
                         <div class="relative">
-                            <select wire:model="status" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none appearance-none cursor-pointer">
+                            <select wire:model="status" class="w-full border-2 border-slate-100 bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 focus:bg-white focus:border-indigo-500 outline-none appearance-none cursor-pointer text-sm sm:text-base">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Lunas">Lunas</option>
                                 <option value="Jatuh Tempo">Jatuh Tempo</option>
@@ -286,11 +289,11 @@
                     </div>
                 </div>
 
-                <div class="pt-4 flex justify-end gap-4 border-t border-slate-50">
-                    <button type="button" wire:click="closeModal" class="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2">
+                <div class="pt-4 flex justify-end gap-3 sm:gap-4 border-t border-slate-50 shrink-0">
+                    <button type="button" wire:click="closeModal" class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors text-sm sm:text-base">Batal</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 text-sm sm:text-base">
                         <svg wire:loading wire:target="simpanPeminjam" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        {{ $peminjam_id ? 'Simpan Perubahan' : 'Simpan Data' }}
+                        {{ $peminjam_id ? 'Simpan' : 'Simpan Data' }}
                     </button>
                 </div>
             </form>

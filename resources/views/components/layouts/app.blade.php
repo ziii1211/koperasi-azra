@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ $title ?? 'Koperasi Azra - Dashboard' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -27,20 +27,31 @@
     </style>
     @livewireStyles
 </head>
-<body class="bg-[#F0F4F8] font-sans antialiased text-slate-700 flex h-screen overflow-hidden selection:bg-indigo-500 selection:text-white relative">
+<body x-data="{ sidebarOpen: false }" class="bg-[#F0F4F8] font-sans antialiased text-slate-700 flex h-screen overflow-hidden selection:bg-indigo-500 selection:text-white relative">
     
     <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
     </div>
 
-    <aside class="w-72 my-4 ml-4 bg-white/80 backdrop-blur-2xl border border-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.03)] flex flex-col justify-between hidden md:flex z-20 animate-slide-left relative overflow-hidden">
+    <div x-show="sidebarOpen" 
+         x-transition.opacity.duration.300ms 
+         @click="sidebarOpen = false"
+         class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden">
+    </div>
+
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-[120%] lg:translate-x-0'" 
+           class="fixed lg:relative inset-y-0 left-0 w-72 my-4 mx-4 lg:ml-4 lg:mr-0 bg-white/90 backdrop-blur-2xl border border-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.08)] flex flex-col justify-between z-50 transition-transform duration-500 ease-in-out">
         
+        <button @click="sidebarOpen = false" class="lg:hidden absolute top-6 right-6 p-2 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-xl transition-colors z-50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
         <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white/60 to-transparent pointer-events-none"></div>
 
-        <div>
-            <div class="h-24 flex items-center px-8 relative z-10">
-                <div class="w-12 h-12 bg-gradient-to-br from-slate-800 via-indigo-950 to-slate-900 rounded-[1.2rem] flex items-center justify-center shadow-xl shadow-indigo-900/20 mr-4 relative group cursor-pointer overflow-hidden border border-slate-700/50">
+        <div class="overflow-y-auto h-full overflow-x-hidden">
+            <div class="h-24 flex items-center px-8 relative z-10 shrink-0">
+                <div class="w-12 h-12 bg-gradient-to-br from-slate-800 via-indigo-950 to-slate-900 rounded-[1.2rem] flex items-center justify-center shadow-xl shadow-indigo-900/20 mr-4 relative group cursor-pointer overflow-hidden border border-slate-700/50 shrink-0">
                     
                     <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out"></div>
                     
@@ -60,9 +71,9 @@
             <nav class="px-5 py-4 space-y-2 relative z-10">
                 <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Menu Utama</p>
                 
-                <a href="/dashboard" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-600 font-bold transition-all shadow-sm border border-indigo-100/50 group relative overflow-hidden">
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-indigo-600 rounded-r-full"></div>
-                    <svg class="w-5 h-5 ml-1 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <a href="/dashboard" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all border group relative overflow-hidden {{ request()->is('dashboard') ? 'bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-600 border-indigo-100/50 shadow-sm' : 'text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-100' }}">
+                    @if(request()->is('dashboard')) <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-indigo-600 rounded-r-full"></div> @endif
+                    <svg class="w-5 h-5 ml-1 relative z-10 {{ request()->is('dashboard') ? '' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110 group-hover:text-indigo-500 transition-all' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     <span class="relative z-10">Buku Kas Modal</span>
                 </a>
 
@@ -86,13 +97,13 @@
 
                 <a href="/input-data-anggota" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all border group relative overflow-hidden {{ request()->is('input-data-anggota') ? 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-600 border-blue-100/50 shadow-sm' : 'text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-100' }}">
                     @if(request()->is('input-data-anggota')) <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-blue-600 rounded-r-full"></div> @endif
-                    <svg class="w-5 h-5 ml-1 relative z-10 {{ request()->is('input-data-anggota') ? '' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110 group-hover:text-blue-500 transition-all' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                    <span class="relative z-10">input-data-anggota</span>
+                    <svg class="w-5 h-5 ml-1 relative z-10 {{ request()->is('input-data-anggota') ? '' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110 group-hover:text-blue-500 transition-all' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <span class="relative z-10">Data Anggota</span>
                 </a>
             </nav>
         </div>
 
-        <div class="p-5 relative z-10 mb-2">
+        <div class="p-5 relative z-10 mb-2 shrink-0">
             <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 shadow-inner">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-10 h-10 rounded-[0.8rem] bg-indigo-100 text-indigo-600 flex items-center justify-center font-extrabold text-lg shadow-sm border border-white">
@@ -118,28 +129,29 @@
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden relative z-10 animate-fade-content">
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative z-10 animate-fade-content w-full">
         
-        <header class="h-24 flex items-center justify-between px-8 lg:px-12 shrink-0">
+        <header class="h-20 lg:h-24 flex items-center justify-between px-6 lg:px-12 shrink-0 border-b border-slate-200/50 lg:border-none bg-white/50 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none z-30">
             <div class="flex items-center gap-4">
-                <button class="md:hidden p-2 text-slate-500 hover:bg-white rounded-xl shadow-sm transition-colors">
+                <button @click="sidebarOpen = true" class="lg:hidden p-2.5 text-slate-600 bg-white hover:bg-indigo-50 hover:text-indigo-600 rounded-xl shadow-sm border border-slate-200 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
+                
                 <div class="hidden sm:block">
-                    <h2 class="text-2xl font-extrabold text-slate-700 tracking-tight">Sistem Simpan Pinjam</h2>
-                    <p class="text-sm font-semibold text-slate-400 mt-0.5">Kelola arus kas dengan cerdas dan aman.</p>
+                    <h2 class="text-xl lg:text-2xl font-extrabold text-slate-700 tracking-tight">Sistem Simpan Pinjam</h2>
+                    <p class="text-xs lg:text-sm font-semibold text-slate-400 mt-0.5">Kelola arus kas dengan cerdas dan aman.</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-5">
-                <div class="hidden sm:flex items-center gap-2.5 px-5 py-2.5 bg-white/60 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-sm cursor-default hover:bg-white transition-colors">
+                <div class="flex items-center gap-2.5 px-4 lg:px-5 py-2 lg:py-2.5 bg-white/80 lg:bg-white/60 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-sm cursor-default transition-colors">
                     <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span class="text-sm font-bold text-slate-600 tracking-wide">{{ \Carbon\Carbon::now()->translatedFormat('d M Y') }}</span>
+                    <span class="text-xs lg:text-sm font-bold text-slate-600 tracking-wide">{{ \Carbon\Carbon::now()->translatedFormat('d M Y') }}</span>
                 </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto px-8 lg:px-12 pb-12">
+        <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-12 pb-24 lg:pb-12 pt-6 lg:pt-0">
             <div class="max-w-7xl mx-auto h-full">
                 {{ $slot }}
             </div>

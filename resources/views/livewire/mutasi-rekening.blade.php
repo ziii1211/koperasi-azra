@@ -42,14 +42,17 @@
     <div class="animate-fade-up-delay flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
         
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-            <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-4 py-2 shadow-sm">
-                <select wire:model.live="perPage" class="bg-transparent text-slate-800 font-bold text-sm focus:outline-none cursor-pointer">
+            
+            <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-4 py-2.5 shadow-sm w-full sm:w-auto">
+                <span class="text-sm font-bold text-slate-500 hidden sm:inline">Tampilkan</span>
+                <select wire:model.live="perPage" class="bg-transparent text-slate-800 font-bold text-sm focus:outline-none cursor-pointer w-full sm:w-auto">
+                    <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
-                <span class="text-sm font-bold text-slate-500">Baris</span>
+                <span class="text-sm font-bold text-slate-500 hidden sm:inline">Data</span>
             </div>
 
             <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-3 py-2 shadow-sm w-full sm:w-auto">
@@ -81,7 +84,7 @@
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
-            <input type="text" wire:model.live.debounce.500ms="search" class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-2xl text-slate-700 font-semibold focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all" placeholder="Cari keterangan mutasi...">
+            <input type="text" wire:model.live.debounce.500ms="search" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all" placeholder="Cari keterangan mutasi...">
         </div>
     </div>
 
